@@ -1,9 +1,21 @@
 <template>
     <div>
-        <div>
-        
+        <div class="select-filters">
+            Moyen de communication
+            <select name="channel"
+                    v-model="channelChoice">
+                <option v-for="channel in channelList"
+                        :value="channel"> {{ channel }} </option>
+            </select>
+            
+            Status
+            <select name="status"
+                    v-model="statusChoice">
+                <option v-for="status in statusList" :value="status"> {{ status }} </option>
+            </select>
+            
+            <button v-on:click="resetFilters"> Supprimer les filtres </button>
         </div>
-        
         <table>
             <thead>
             <tr>
@@ -46,7 +58,9 @@
                 sortKey: '',
                 sortOrders: sortOrders,
                 statusList: [],
-                channelList: []
+                channelList: [],
+                statusChoice: '',
+                channelChoice: ''
             }
         },
         created() {
@@ -78,6 +92,15 @@
                         });
                 }
                 
+                const channelChoice = this.channelChoice;
+                const statusChoice = this.statusChoice;
+                
+                if (channelChoice && statusChoice) {
+                    data = data
+                        .filter(row => row.contact_channel === channelChoice && row.status === statusChoice);
+                } else if (channelChoice) data = data.filter(row => row.contact_channel === channelChoice);
+                else if(statusChoice) data = data.filter(row => row.status === statusChoice);
+                
                 return data;
             }
         },
@@ -85,6 +108,11 @@
             sortBy(key) {
                 this.sortKey = key;
                 this.sortOrders[key] = this.sortOrders[key] * -1
+            },
+    
+            resetFilters() {
+                this.statusChoice = '';
+                this.channelChoice = '';
             }
         },
         filters: {
@@ -122,8 +150,8 @@
                         keyToInsert = 'Téléphone';
                         break;
                 }
-    
-    
+                
+                
                 return keyToInsert;
             },
             formatDate(value) {
@@ -186,5 +214,10 @@
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
         border-top: 4px solid #fff;
+    }
+    
+    .select-filters {
+        text-align: center;
+        margin-bottom: 7vh;
     }
 </style>
